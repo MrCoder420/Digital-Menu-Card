@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 250px;
+      background-color: #333;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: fixed;
+      height: 100%;
+    }
+    .sidebar h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #f8f9fa;
+    }
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 15px 20px;
+      margin: 10px 0;
+      display: block;
+      border-radius: 4px;
+      transition: background 0.3s;
+      font-size: 18px;
+    }
+    .sidebar a:hover {
+      background-color: #575757;
+    }
+    .sidebar i {
+      margin-right: 10px;
+    }
+    .content {
+      flex: 1;
+      margin-left: 250px;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+    }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 40px);
+      border: none;
+    }
+    .content h1 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Dashboard</h2>
+   
+    <a href="#" onclick="loadPage('item_types.html')"><i class="fas fa-list"></i> Items Type</a>
+    <a href="#" onclick="loadPage('products.html')"><i class="fas fa-box-open"></i> Products</a>
+  
+  </div>
+  <div class="content">
+    <iframe id="mainFrame" src="dashboard.html"></iframe>
+  </div>
+  <script>
+    function loadPage(page) {
+      document.getElementById('mainFrame').src = page;
+    }
+  </script>
+</body>
+</html>

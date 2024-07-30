@@ -1,0 +1,8 @@
+curl -X POST http://localhost/dmc/login.php -H "Content-Type: application/json" -d  \"password\": \"testpassword\", \"email\": \"tests@eaxample.com\"}"
+
+
+curl -X POST http://localhost/dmc/login.php -H "Content-Type: application/json" -d "{\"email\": \"n@c.c\",\"password\": \"123\"}"
+
+
+curl -X POST http://localhost/dmc/add_item.php -H "Content-Type: application/json" -d '{"item_name": "Cheese Burger", "psize_id":3, "item_type_id": 2, "price": 150.00}'
+

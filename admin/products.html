@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Product Management</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    .card {
+      margin: 20px 0;
+    }
+    .btn-add-product {
+      margin: 20px 0;
+    }
+    .modal-content {
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Product Management</h1>
+    <button class="btn btn-primary btn-add-product" data-toggle="modal" data-target="#addProductModal">
+      <i class="fas fa-plus"></i> Add Product
+    </button>
+
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title">Product List</h4>
+        <table class="table table-bordered table-striped" id="productTable">
+          <thead class="thead-dark">
+            <tr>
+              <th>ID</th>
+              <th>Item Name</th>
+              <th>Size</th>
+              <th>Type</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody">
+            <!-- Product rows will be inserted here dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addProductModalLabel">Add New Product</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="addProductForm">
+              <div class="form-group">
+                <label for="itemName">Item Name</label>
+                <input type="text" class="form-control" id="itemName" required>
+              </div>
+              <div class="form-group">
+                <label for="psize">Plate Size</label>
+                <select class="form-control" id="psize" required></select>
+              </div>
+              <div class="form-group">
+                <label for="itemType">Item Type</label>
+                <select class="form-control" id="itemType" required></select>
+              </div>
+              <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" class="form-control" id="price" step="0.01" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Add Product</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Include JS libraries -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Fetch and display products
+        const response = await axios.get('http://localhost/dmc/fetch_items.php');
+        const data = response.data.data;
+
+        const productTableBody = document.getElementById('productTableBody');
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.item_name}</td>
+            <td>${item.ps}</td>
+            <td>${item.tname}</td>
+            <td>${item.price}</td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct(${item.id})">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </td>
+          `;
+          productTableBody.appendChild(row);
+        });
+
+        // Fetch and populate plate sizes and item types for the form
+        const [psizeResponse, itemTypeResponse] = await Promise.all([
+          axios.get('http://localhost/dmc/fetch_psize.php'),
+          axios.get('http://localhost/dmc/fetch_item_type.php')
+        ]);
+
+        const psizeSelect = document.getElementById('psize');
+        psizeResponse.data.data.forEach(psize => {
+          const option = document.createElement('option');
+          option.value = psize.id;
+          option.textContent = psize.ps;
+          psizeSelect.appendChild(option);
+        });
+
+        const itemTypeSelect = document.getElementById('itemType');
+        itemTypeResponse.data.data.forEach(itemType => {
+          const option = document.createElement('option');
+          option.value = itemType.tid;
+          option.textContent = itemType.tname;
+          itemTypeSelect.appendChild(option);
+        });
+        
+        // Handle form submission
+        const addProductForm = document.getElementById('addProductForm');
+        addProductForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const itemName = document.getElementById('itemName').value;
+          const psizeId = document.getElementById('psize').value;
+          const itemTypeId = document.getElementById('itemType').value;
+          const price = document.getElementById('price').value;
+
+          try {
+            const response = await axios.post('http://localhost/dmc/add_item.php', {
+              item_name: itemName,
+              psize_id: psizeId,
+              item_type_id: itemTypeId,
+              price: parseFloat(price)
+            });
+
+            if (response.data.status === 'success') {
+              alert('Product added successfully!');
+              window.location.reload(); // Refresh the page to see the new product
+            } else {
+              alert('Error adding product: ' + response.data.message);
+            }
+          } catch (error) {
+            console.error('Error adding product:', error);
+            alert('Error adding product');
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    });
+
+    async function deleteProduct(id) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        try {
+          const response = await axios.post('http://localhost/dmc/delete_item.php', {
+            id: id
+          });
+
+          if (response.data.status === 'success') {
+            alert('Product deleted successfully!');
+            window.location.reload(); // Refresh the page to see the updated product list
+          } else {
+            alert('Error deleting product: ' + response.data.message);
+          }
+        } catch (error) {
+          console.error('Error deleting product:', error);
+          alert('Error deleting product');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

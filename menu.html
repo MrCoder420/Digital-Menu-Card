@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body>
+    <CENTER><h1>DIGITAL MENU CARD</h1></CENTER>
+
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <td>id</td>
+            <td>Item Name</td>
+            <td>Size</td>
+            <td>Type</td>
+            <td>Prise</td>
+        </thead>
+
+        <tbody id="tabledata">
+
+
+
+
+        </tbody>
+
+
+
+
+    </table>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            let tabledata = document.getElementById("tabledata");
+try{
+    const response = await axios.get('http://localhost/dmc/fetch_items.php');
+            const data = response.data.data;
+            
+    
+    data.forEach(item =>{
+
+        console.log(item);
+
+        let row = document.createElement('tr');
+
+        let id = document.createElement('td');
+        id.textContent=item.id;
+        row.append(id);
+
+        let nm = document.createElement('td');
+        nm.textContent=item.item_name;
+        row.append(nm);
+
+        let ps = document.createElement('td');
+        ps.textContent=item.ps;
+        row.append(ps);
+
+        let tname = document.createElement('td');
+        tname.textContent=item.tname;
+        row.append(tname);
+
+
+
+       let p = document.createElement('td');
+        p.textContent=item.price;
+        row.append(p);
+        
+      
+      
+
+
+        tabledata.append(row);
+
+
+    });
+
+
+}
+catch(error){
+    console.error('error fetching',error);
+}
+        
+
+            
+            
+
+
+        });
+
+
+
+    </script>
+</body>
+</html>
