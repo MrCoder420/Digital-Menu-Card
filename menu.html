@@ -5,95 +5,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" integrity="sha512-JSCFHhKDilTRRXe9ak/FJ28dcpOJxzQaCd3Xg8MyF6XFjODhy/YMCM8HW0TFDckNHWUewW+kfvhin43hKtJxAw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-    <CENTER><h1>DIGITAL MENU CARD</h1></CENTER>
+<div class="container">
+    <div>
+        <CENTER><h1>DIGITAL MENU CARD</h1></CENTER>
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>id</th>
+                    <th>Item Name</th>
+                    <th>Type</th>
+                    <th>Price</th>
+                    <th>Order</th>
+                </tr>
+            </thead>
+            <tbody id="tabledata">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <div class="modal fade" id="orderModal" tabindex="-1" role="dialog" aria-labelledby="orderModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="orderModalLabel">Place Your Order</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="orderForm">
+                        <div class="form-group">
+                            <label for="orderItemName">Item Name</label>
+                            <input type="text" class="form-control" id="orderItemName" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderQuantity">Quantity</label>
+                            <input type="number" class="form-control" id="orderQuantity" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="orderItemTotalPrice">Total Price</label>
+                            <input type="text" class="form-control" id="orderItemTotalPrice" readonly>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="placeOrderBtn">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
-            <td>id</td>
-            <td>Item Name</td>
-            <td>Size</td>
-            <td>Type</td>
-            <td>Prise</td>
-        </thead>
+<script>
+let currentItemPrice = 0;
 
-        <tbody id="tabledata">
+function qp() {
+    let q = document.getElementById('orderQuantity').value;
+    document.getElementById('orderItemTotalPrice').value = currentItemPrice * q;
+}
 
-
-
-
-        </tbody>
-
-
-
-
-    </table>
-
-
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            let tabledata = document.getElementById("tabledata");
-try{
-    const response = await axios.get('http://localhost/dmc/fetch_items.php');
-            const data = response.data.data;
-            
+document.addEventListener('DOMContentLoaded', async () => {
+    let tabledata = document.getElementById("tabledata");
     
-    data.forEach(item =>{
 
-        console.log(item);
+    try {
+        const response = await axios.get('http://localhost/dmc/fetch_items.php');
+        const data = response.data.data;
 
-        let row = document.createElement('tr');
+        data.forEach(item => {
+            let row = document.createElement('tr');
 
-        let id = document.createElement('td');
-        id.textContent=item.id;
-        row.append(id);
+            let id = document.createElement('td');
+            id.textContent = item.id;
+            row.append(id);
 
-        let nm = document.createElement('td');
-        nm.textContent=item.item_name;
-        row.append(nm);
+            let psi = item.ps;
 
-        let ps = document.createElement('td');
-        ps.textContent=item.ps;
-        row.append(ps);
+            let nm = document.createElement('td');
+            nm.textContent = psi === "" ? item.item_name : item.item_name + " (" + psi + ")";
+            row.append(nm);
 
-        let tname = document.createElement('td');
-        tname.textContent=item.tname;
-        row.append(tname);
+            let tname = document.createElement('td');
+            tname.textContent = item.tname;
+            row.append(tname);
 
+            let p = document.createElement('td');
+            p.textContent = item.price;
+            row.append(p);
 
+            let order = document.createElement('td');
+            let orderBtn = document.createElement('button');
+            orderBtn.textContent = 'Order';
+            orderBtn.className = 'btn btn-primary';
+            orderBtn.addEventListener('click', () => {
+                currentItemPrice = item.price;
+                document.getElementById('orderItemName').value = item.item_name;
+                document.getElementById('orderQuantity').value = 1;
+                document.getElementById('orderItemTotalPrice').value = item.price;
+                $('#orderModal').modal('show');
 
-       let p = document.createElement('td');
-        p.textContent=item.price;
-        row.append(p);
-        
-      
-      
+               
+            });
+            order.append(orderBtn);
+            row.append(order);
 
-
-        tabledata.append(row);
-
-
-    });
-
-
-}
-catch(error){
-    console.error('error fetching',error);
-}
-        
-
-            
-            
-
-
+            tabledata.append(row);
         });
 
+    } catch (error) {
+        console.error('error fetching', error);
+    }
+});
 
+document.getElementById('orderQuantity').addEventListener('change', qp);
 
-    </script>
+document.getElementById('placeOrderBtn').addEventListener('click', () => {
+    let itemName = document.getElementById('orderItemName').value;
+    let quantity = document.getElementById('orderQuantity').value;
+    let totalPrice = document.getElementById('orderItemTotalPrice').value;
+    if(localStorage.getItem("email")==null){
+        alert("pleased login");
+         window.location.href = 'login.html';
+
+    }
+    else{
+        $('#orderModal').modal('hide');
+    }
+
+    // Handle order placement logic here
+    console.log(`Order placed for ${itemName}, quantity: ${quantity}, total price: ${totalPrice}`);
+
+   
+});
+</script>
 </body>
 </html>
