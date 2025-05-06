@@ -1,6 +1,7 @@
 # 🍽️ Digital Menu Card
 
 A responsive and interactive digital menu system that allows customers to browse food items and place orders online. It includes a full-featured admin panel where the restaurant owner can manage products and categories efficiently.
+![Menu Screenshot](assets/home_page.jpg)
 
 ---
 
